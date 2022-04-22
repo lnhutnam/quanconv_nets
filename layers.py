@@ -18,13 +18,13 @@ class QuanConvFunction(Function):
     def forward(ctx, inputs, in_channels, out_channels, kernel_size, quantum_circuits, shift):
         """Forward pass computation function
         Args:
-            ctx (_type_): ctx is a context object that can be used to stash information for backward computation. You can cache arbitrary objects for use in the backward pass using the ctx.save_for_backward method.
+            ctx: ctx is a context object that can be used to stash information for backward computation. You can cache arbitrary objects for use in the backward pass using the ctx.save_for_backward method.
             inputs (Tensor): a Tensor containing the input
             in_channels (int): Number of channels in the input image
             out_channels (int): Number of channels produced by the convolution
             kernel_size (int): Size of the convolving kernel
             quantum_circuits (_type_): _description_
-            shift (_type_): _description_
+            shift (float): The parameter-shift rule is an approach to measuring gradients of quantum circuits with respect to their parameters, which does not require ancilla qubits or controlled operations
         Returns: a Tensor containing the output
         Example:
             input shape : (-1, 1, 28, 28)
@@ -82,8 +82,8 @@ class QuanConvFunction(Function):
         """Backward pass computation function
 
         Args:
-            ctx (_type_): ctx is a context object that can be used to stash information for backward computation
-            grad_outputs (_type_): _description_
+            ctx: ctx is a context object that can be used to stash information for backward computation
+            grad_outputs (Tensor): a Tensor containing the gradient outputs
         """
         input, expectation_z = ctx.saved_tensors
         input_list = np.array(input.tolist())
@@ -122,9 +122,9 @@ class QuanConv(torch.nn.Module):
             in_channels (int): Number of channels in the input image
             out_channels (int): Number of channels produced by the convolution
             kernel_size (int): Size of the convolving kernel
-            back_end (_type_, optional): _description_. Defaults to qiskit.Aer.get_backend('qasm_simulator').
+            back_end (qiskit.Aer.backend, optional): _description_. Defaults to qiskit.Aer.get_backend('qasm_simulator').
             shots (int, optional): How many shots we wish to use in our quantum circuit. Defaults to 100.
-            shift (_type_, optional): _description_. Defaults to np.pi/2. Read "Gradients of parameterized quantum gates using the parameter-shift rule and gate decomposition" for more information about shift parameter https://arxiv.org/pdf/1905.13311.pdf
+            shift (float, optional): _description_. Defaults to np.pi/2. Read "Gradients of parameterized quantum gates using the parameter-shift rule and gate decomposition" for more information about shift parameter https://arxiv.org/pdf/1905.13311.pdf
         back_end support list:
             aer_simulator
             aer_simulator_statevector
